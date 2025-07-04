@@ -7,6 +7,10 @@
 #ifdef RTC_DESKTOP_DEVICE
 #include "rtc_desktop_device.h"
 #endif
+#include <memory>
+
+#include "api/video_codecs/video_decoder_factory.h"
+#include "api/video_codecs/video_encoder_factory.h"
 #include "rtc_media_stream.h"
 #include "rtc_mediaconstraints.h"
 #include "rtc_video_device.h"
@@ -63,6 +67,12 @@ class RTCPeerConnectionFactory : public RefCountInterface {
 
   virtual scoped_refptr<RTCRtpCapabilities> GetRtpReceiverCapabilities(
       RTCMediaType media_type) = 0;
+
+  virtual void SetVideoEncoderFactory(
+      std::unique_ptr<webrtc::VideoEncoderFactory> encoder_factory) = 0;
+
+  virtual void SetVideoDecoderFactory(
+      std::unique_ptr<webrtc::VideoDecoderFactory> decoder_factory) = 0;
 };
 
 }  // namespace libwebrtc

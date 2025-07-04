@@ -38,4 +38,17 @@ LibWebRTC::CreateRTCPeerConnectionFactory() {
   return rtc_peerconnection_factory;
 }
 
+scoped_refptr<RTCPeerConnectionFactory>
+LibWebRTC::CreateRTCPeerConnectionFactory(
+    std::unique_ptr<webrtc::VideoEncoderFactory> encoder_factory,
+    std::unique_ptr<webrtc::VideoDecoderFactory> decoder_factory) {
+  scoped_refptr<RTCPeerConnectionFactoryImpl> impl =
+      new RefCountedObject<RTCPeerConnectionFactoryImpl>();
+  impl->SetVideoEncoderFactory(std::move(encoder_factory));
+  impl->SetVideoDecoderFactory(std::move(decoder_factory));
+  scoped_refptr<RTCPeerConnectionFactory> factory = impl;
+  factory->Initialize();
+  return factory;
+}
+
 }  // namespace libwebrtc

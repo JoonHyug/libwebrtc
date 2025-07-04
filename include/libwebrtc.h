@@ -1,6 +1,10 @@
 #ifndef LIB_WEBRTC_HXX
 #define LIB_WEBRTC_HXX
 
+#include <memory>
+
+#include "api/video_codecs/video_decoder_factory.h"
+#include "api/video_codecs/video_encoder_factory.h"
 #include "rtc_peerconnection_factory.h"
 #include "rtc_types.h"
 
@@ -42,6 +46,11 @@ class LibWebRTC {
    */
   LIB_WEBRTC_API static scoped_refptr<RTCPeerConnectionFactory>
   CreateRTCPeerConnectionFactory();
+
+  LIB_WEBRTC_API static scoped_refptr<RTCPeerConnectionFactory>
+  CreateRTCPeerConnectionFactory(
+      std::unique_ptr<webrtc::VideoEncoderFactory> encoder_factory,
+      std::unique_ptr<webrtc::VideoDecoderFactory> decoder_factory);
 
   /**
    * @brief Terminates the WebRTC PeerConnectionFactory and threads.

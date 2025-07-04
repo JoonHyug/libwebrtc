@@ -106,3 +106,25 @@ ninja -C out-debug/Linux-x64 libwebrtc
 ```
 
 
+
+## Using a custom FFmpeg encoder
+
+You can inject your own `VideoEncoderFactory` to replace the default encoder. The
+example below creates a factory using FFmpeg and passes it when constructing the
+`RTCPeerConnectionFactory`:
+
+```cpp
+#include "ffmpeg/ffmpeg_video_encoder.h"
+using namespace libwebrtc;
+
+int main() {
+  LibWebRTC::Initialize();
+  auto factory = LibWebRTC::CreateRTCPeerConnectionFactory(
+      std::make_unique<FfmpegVideoEncoderFactory>(), nullptr);
+  // use `factory` to create peer connections...
+  LibWebRTC::Terminate();
+}
+```
+
+This approach keeps the library code unchanged while enabling custom encoding
+implementations such as FFmpeg.

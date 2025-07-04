@@ -64,17 +64,25 @@ bool RTCPeerConnectionFactoryImpl::Initialize() {
   }
 
   if (!rtc_peerconnection_factory_) {
+    std::unique_ptr<webrtc::VideoEncoderFactory> encoder_factory;
+    std::unique_ptr<webrtc::VideoDecoderFactory> decoder_factory;
+#if defined(USE_INTEL_MEDIA_SDK)
+    encoder_factory = CreateIntelVideoEncoderFactory();
+    decoder_factory = CreateIntelVideoDecoderFactory();
+#else
+    encoder_factory = webrtc::CreateBuiltinVideoEncoderFactory();
+    decoder_factory = webrtc::CreateBuiltinVideoDecoderFactory();
+#endif
+    if (custom_video_encoder_factory_)
+      encoder_factory = std::move(custom_video_encoder_factory_);
+    if (custom_video_decoder_factory_)
+      decoder_factory = std::move(custom_video_decoder_factory_);
+
     rtc_peerconnection_factory_ = webrtc::CreatePeerConnectionFactory(
         network_thread_.get(), worker_thread_.get(), signaling_thread_.get(),
         audio_device_module_, webrtc::CreateBuiltinAudioEncoderFactory(),
-        webrtc::CreateBuiltinAudioDecoderFactory(),
-#if defined(USE_INTEL_MEDIA_SDK)
-        CreateIntelVideoEncoderFactory(), CreateIntelVideoDecoderFactory(),
-#else
-        webrtc::CreateBuiltinVideoEncoderFactory(),
-        webrtc::CreateBuiltinVideoDecoderFactory(),
-#endif
-        nullptr, nullptr);
+        webrtc::CreateBuiltinAudioDecoderFactory(), std::move(encoder_factory),
+        std::move(decoder_factory), nullptr, nullptr);
   }
 
   if (!rtc_peerconnection_factory_.get()) {
@@ -339,6 +347,16 @@ RTCPeerConnectionFactoryImpl::GetRtpReceiverCapabilities(
       rtc_peerconnection_factory_->GetRtpReceiverCapabilities(type);
   return scoped_refptr<RTCRtpCapabilities>(
       new RefCountedObject<RTCRtpCapabilitiesImpl>(rtp_capabilities));
+}
+
+void RTCPeerConnectionFactoryImpl::SetVideoEncoderFactory(
+    std::unique_ptr<webrtc::VideoEncoderFactory> encoder_factory) {
+  custom_video_encoder_factory_ = std::move(encoder_factory);
+}
+
+void RTCPeerConnectionFactoryImpl::SetVideoDecoderFactory(
+    std::unique_ptr<webrtc::VideoDecoderFactory> decoder_factory) {
+  custom_video_decoder_factory_ = std::move(decoder_factory);
 }
 
 }  // namespace libwebrtc

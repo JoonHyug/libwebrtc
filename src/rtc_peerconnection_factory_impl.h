@@ -6,6 +6,8 @@
 #include "api/media_stream_interface.h"
 #include "api/peer_connection_interface.h"
 #include "api/task_queue/task_queue_factory.h"
+#include "api/video_codecs/video_decoder_factory.h"
+#include "api/video_codecs/video_encoder_factory.h"
 #include "rtc_audio_device_impl.h"
 #include "rtc_base/thread.h"
 #include "rtc_peerconnection.h"
@@ -73,6 +75,12 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   scoped_refptr<RTCRtpCapabilities> GetRtpReceiverCapabilities(
       RTCMediaType media_type) override;
 
+  void SetVideoEncoderFactory(
+      std::unique_ptr<webrtc::VideoEncoderFactory> encoder_factory) override;
+
+  void SetVideoDecoderFactory(
+      std::unique_ptr<webrtc::VideoDecoderFactory> decoder_factory) override;
+
   rtc::Thread* signaling_thread() { return signaling_thread_.get(); }
 
  protected:
@@ -103,6 +111,9 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
 #endif
   std::list<scoped_refptr<RTCPeerConnection>> peerconnections_;
   std::unique_ptr<webrtc::TaskQueueFactory> task_queue_factory_;
+
+  std::unique_ptr<webrtc::VideoEncoderFactory> custom_video_encoder_factory_;
+  std::unique_ptr<webrtc::VideoDecoderFactory> custom_video_decoder_factory_;
 };
 
 }  // namespace libwebrtc

@@ -147,6 +147,8 @@ rtc_shared_library("libwebrtc") {
     "src/rtc_video_source_impl.h",
     "src/rtc_video_track_impl.cc",
     "src/rtc_video_track_impl.h",
+    "src/ffmpeg/ffmpeg_video_encoder.cc",
+    "src/ffmpeg/ffmpeg_video_encoder.h",
   ]
 
   # intel media sdk
